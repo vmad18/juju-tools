@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+ml-stuff/
+ml-stuff2/
+llama3_8b_weights/
+.idea/
+juju_tools/_experiments
+new_gen_2.py
