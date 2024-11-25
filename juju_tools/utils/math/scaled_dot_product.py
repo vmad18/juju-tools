@@ -1,6 +1,13 @@
 from torch.autograd import Function
-from juju_tools.utils import *
+from torch.backends.cudnn import deterministic
 
+from juju_tools.utils import *
+try:
+    from flash_attn import flash_attn_func
+    FLASH_ATTN = True
+except:
+    logger.info("Cannot use Flash Attention, using regular attention")
+    FLASH_ATTN = False
 
 def scaled_dot_product(
         q: Tensor,
@@ -31,15 +38,19 @@ def scaled_dot_product(
     
     """
 
-    norm = scaling_norm if not (scaling_norm is None) else 1. / sqrt(q.shape[-1])
-    mask = torch.zeros((1, 1, q.shape[-2], k.shape[-2]), device=q.device, dtype=torch.float32) if mask is None else mask
+    if not FLASH_ATTN:
+        norm = scaling_norm if not (scaling_norm is None) else 1. / sqrt(q.shape[-1])
+        mask = torch.zeros((1, 1, q.shape[-2], k.shape[-2]), device=q.device, dtype=torch.float32) if mask is None else mask
 
-    attends = (q @ k.transpose(-2, -1)).float() * norm + mask
+        attends = (q @ k.transpose(-2, -1)).float() * norm + mask
 
-    attn = F.softmax(attends, dtype=torch.float32, dim=-1).to(q.dtype)
-    attn = F.dropout(attn, p=drop_r, training=training)
-    
-    return attn @ v
+        attn = F.softmax(attends, dtype=torch.float32, dim=-1).to(q.dtype)
+        attn = F.dropout(attn, p=drop_r, training=training)
+        return attn @ v
+
+    return flash_attn_func(q.to(torch.bfloat16), k.to(torch.bfloat16), v.to(torch.bfloat16),
+                           dropout=drop_r, softmax_scale=scaling_norm, causal=True, window_size=(-1, -1),
+                           alibi_slopes=None, deterministic=True)
 
 
 

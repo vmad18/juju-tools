@@ -10,7 +10,7 @@ class FeedForward(Module):
         
         self.config = config
 
-        hidden = int(self.config.dim * self.config.scale)
+        hidden = int(self.config.dim * self.config.expansion_scale)
 
         self.proj_up = nn.Linear(self.config.dim, hidden, bias=self.config.bias, device=self.config.device)
         self.gate = nn.Linear(self.config.dim, hidden, bias=self.config.bias, device=self.config.device) \

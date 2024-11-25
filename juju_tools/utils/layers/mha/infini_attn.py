@@ -3,6 +3,7 @@ from juju_tools.utils import *
 from juju_tools.utils.layers import RoPE
 from juju_tools.utils.math import scaled_dot_product, FlashAttention
 
+# Apparently this was just smoke and mirrors and actually is kinda mid
 class InfiniAttention(ModuleConfig):
 
     r"""

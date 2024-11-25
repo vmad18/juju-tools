@@ -7,7 +7,6 @@ from juju_tools.utils.math import scaled_dot_product, FlashAttention, causal_mas
 from juju_tools.utils.layers.mha.attn_utils import DynKVCache
 from juju_tools.kernels.py.fused_attn import flash_attn
 
-# TODO make sure the masking stuff is done correctly
 # TODO remove forward parameters for flash attn
 class CausalAttention(ModuleConfig):
     r"""

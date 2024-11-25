@@ -1,48 +1,14 @@
+import torch
+
 from juju_tools.utils.consts import *
-
-from scipy.stats import norm
-from enum import Enum
-
-# from juju_tools.utils.layers import *
-
-"""
-
-Estimates the Hessian for Pre-conditioning
-
-"""
-
-
-class Estimator:
-
-    def __init__(self) -> None: pass
-
-    def compute(self, params: List[Tensor], loss: Tensor, logits: Optional[Tensor] = null) -> List[Tensor]:
-        pass
-
-
-class ModuleConfig(Module):
-
-    def __init__(self, **kwargs):
-        super().__init__()
-
-        self.bsz = DEF_MAX_BSZ
-        self.max_tokens = DEF_MAX_TOK
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-
-        self.B_q: int = 1024
-        self.B_kv: int = 2048
-        self.__dict__.update(kwargs)
-
 
 class Config(object):
 
     def __init__(self, **kwargs):
         self.bsz = DEF_MAX_BSZ
         self.max_tokens = DEF_MAX_TOK
+        self.vocab_size = 100000
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-
-        self.B_q: int = 1024
-        self.B_kv: int = 2048
 
         self.dim = 512
 
@@ -51,12 +17,15 @@ class Config(object):
 
         self.n_layers = 32
         self.eps = 1e-5
+        self.rope = True
         self.rope_base = 5e5
+        self.sm_scale = 1 / sqrt(self.head_dim)
 
         self.bias = False
         self.drop_r = 0.1
 
-        self.scale: float = 2
+        self.expansion_scale: float = 2  # expansion factor
+        self.hidden_state: int = int(self.expansion_scale * self.dim)
         self.nl: Callable[[Tensor], Tensor] = F.silu
         self.gate: bool = True
 
@@ -107,6 +76,41 @@ class LLaMaConfig(Config):
         self.__dict__.update(kwargs)
 
 
+class nGPTConfig(Config):
+    def __init__(self, **kwargs):
+        super.__init__(**kwargs)
+
+        self.rope = True
+        self.sm_scale = sqrt(self.head_dim)
+
+        self.__dict__.update(kwargs)
+        self.norm_dim = -1
+
+        # eigen learning rate and scaling factors
+        self.alpha_a_scale = 1. / self.n_layers
+        self.alpha_a_init = sqrt(self.dim)
+
+        self.alpha_m_scale = 1.
+        self.alpha_m_init = 1.
+
+        self.s_qk_scale = 1. / (self.dim ** 0.5)
+        self.s_qk_init = 1.
+
+        self.s_u_scale = 1. / (self.dim ** 0.5)
+        self.s_u_init = 1.
+
+        self.s_v_scale = 1. / (self.dim ** 0.5)
+        self.s_v_init = 1.
+        self.v_scale = sqrt(self.dim)
+
+        self.s_z_scale = 1. / (self.dim ** 0.5)
+        self.s_z_init = 1.
+
+        self.dtype = torch.bfloat16
+
+
+        self.__dict__.update(kwargs)
+
 class Phi3MiniConfig(Config):
 
     def __init__(self, **kwargs):
@@ -132,43 +136,19 @@ class LModelConfig(Config):
         self.__dict__.update(kwargs)
 
 
+class ModuleConfig(Module):
+
+    def __init__(self, **kwargs):
+        super().__init__()
+
+        self.bsz = DEF_MAX_BSZ
+        self.max_tokens = DEF_MAX_TOK
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+
+        self.__dict__.update(kwargs)
+
 def linear_weight(
         in_features,
         out_features,
         requires_grad=True) -> Tensor:
     return torch.nn.init.xavier_uniform_(torch.zeros((out_features, in_features), requires_grad=requires_grad))
-
-
-def compute_normal_fpk(bits, e=.967752) -> Tensor:
-    half_1 = 2 ** bits // 2
-    half_2 = 2 ** bits // 2 + 1
-
-    v1 = (-norm.ppf(torch.linspace(.5, e, half_1, dtype=torch.float16))).tolist()[1:]
-    v2 = (norm.ppf(torch.linspace(.5, e, half_2, dtype=torch.float16))).tolist()
-
-    g = v1 + v2
-    g.sort()
-    nf4 = torch.tensor(g)
-    nf4 /= nf4.amax()
-
-    return nf4.to(torch.bfloat16)
-
-
-# class QuantType(Enum):
-#     NFK = 1
-#     INT8 = 2
-
-
-# class Quantizer(object):
-#
-#     def __init__(self, data: Tensor) -> None:
-#         self.data = data
-#
-#     def quant(self) -> Tuple[Tensor, ...]:
-#         pass
-#
-#     def dequant(self) -> Tuple[Tensor, ...]:
-#         pass
-
-
-PRECOMPUTED_NORMAL_FP4 = compute_normal_fpk(bits=4)

@@ -72,7 +72,7 @@ class LLaMa(BaseModel):
             try:
                 self.layers.append(LLaMaBlockDecoder(self.config, i))
             except:
-                logger.info("Going back to fallback - Out of Memory")
+                logger.info("Going to fallback - Out of Memory")
                 self.config.device = "meta"
                 self.layers.append(LLaMaBlockDecoder(self.config, i))
         super().load()

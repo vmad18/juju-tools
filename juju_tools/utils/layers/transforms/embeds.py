@@ -54,13 +54,11 @@ class RoPE(Module):
         self.scaling = scaling
 
     def comp_rots(self) -> Tensor:
-        # theta = torch.exp(
-        #     -log(self.base) * torch.arange(0, self.dim, 2, device=self.config.device, dtype=torch.int64) / self.dim)[
-        #     None, ...]
-        
-        theta = 1. / (self.base ** (torch.arange(0, self.dim, 2, device=self.config.device).float() / self.dim))
-        m = torch.arange(self.config.max_tokens, device=self.config.device, dtype=torch.float32)[..., None].float()
+        theta = torch.exp(
+            -log(self.base) * torch.arange(0, self.dim, 2, device=self.config.device, dtype=torch.int64) / self.dim)[
+            None, ...]
 
+        m = torch.arange(self.config.max_tokens, device=self.config.device, dtype=torch.float32)[..., None].float()
         freqs = m * theta
         mag = torch.ones_like(freqs, device=self.config.device)
 
@@ -110,6 +108,6 @@ class DynNTKRoPE(RoPE):
         seq = shift + q.shape[-2] + 1
 
         if seq > self.config.max_tokens:
-            self.base = (self.base * self.scaling * seq / (self.config.max_tokens)) ** (self.dim / (self.dim - 2))
+            self.base = (self.base * self.scaling * seq / self.config.max_tokens) ** (self.dim / (self.dim - 2))
 
         return super().forward(q, k, shift)
