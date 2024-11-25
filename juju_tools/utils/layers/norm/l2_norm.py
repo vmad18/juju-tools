@@ -1,4 +1,4 @@
-from juju_tools.utils.consts import *
+from juju_tools.utils import *
 
 # L2 Normalization
 class L2Norm(Module):

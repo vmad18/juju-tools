@@ -2,6 +2,7 @@ from juju_tools.utils import nGPTConfig
 from juju_tools.utils.consts import *
 from juju_tools.utils.layers import NormAttention, NormFeedForward, L2Norm
 
+
 class nGPTBlock(Module):
 
     def __init__(self, config: nGPTConfig, layer_idx: Optional[int]):
@@ -18,6 +19,7 @@ class nGPTBlock(Module):
         h = self.norm_ffn(h)
         return h
 
+
 class nGPT(Module):
 
     def __init__(self, config: nGPTConfig):
@@ -30,6 +32,7 @@ class nGPT(Module):
         for layer in self.layers:
             h = layer(h)
         return h
+
 
 class nGPTAutoRegressive(Module):
 

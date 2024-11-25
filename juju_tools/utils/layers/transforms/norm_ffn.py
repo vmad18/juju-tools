@@ -1,5 +1,5 @@
 from juju_tools.utils import *
-from juju_tools.utils.layers import L2Norm
+from juju_tools.utils.layers.norm.l2_norm import L2Norm
 
 class NormFeedForward(Module):
 

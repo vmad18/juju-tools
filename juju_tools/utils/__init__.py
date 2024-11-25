@@ -78,7 +78,7 @@ class LLaMaConfig(Config):
 
 class nGPTConfig(Config):
     def __init__(self, **kwargs):
-        super.__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.rope = True
         self.sm_scale = sqrt(self.head_dim)
@@ -87,19 +87,19 @@ class nGPTConfig(Config):
         self.norm_dim = -1
 
         # eigen learning rate and scaling factors
-        self.alpha_a_scale = 1. / self.n_layers
-        self.alpha_a_init = sqrt(self.dim)
+        self.alpha_a_scale = 1. / sqrt(self.dim)
+        self.alpha_a_init =  1. / self.n_layers
 
-        self.alpha_m_scale = 1.
-        self.alpha_m_init = 1.
+        self.alpha_m_scale = 1. / sqrt(self.dim)
+        self.alpha_m_init = 1. / self.n_layers
 
         self.s_qk_scale = 1. / (self.dim ** 0.5)
         self.s_qk_init = 1.
 
-        self.s_u_scale = 1. / (self.dim ** 0.5)
+        self.s_u_scale = 1.
         self.s_u_init = 1.
 
-        self.s_v_scale = 1. / (self.dim ** 0.5)
+        self.s_v_scale = 1.
         self.s_v_init = 1.
         self.v_scale = sqrt(self.dim)
 

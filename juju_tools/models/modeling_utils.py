@@ -2,8 +2,10 @@ from juju_tools.utils import *
 from juju_tools.utils import Config
 
 from juju_tools.utils.layers import RMSNorm, LinearNFK
-import bitsandbytes as bnb
-
+try:
+    import bitsandbytes as bnb
+except:
+    logger.info("Cannot import bitsandbytes!")
 
 class BaseModel(Module):
 

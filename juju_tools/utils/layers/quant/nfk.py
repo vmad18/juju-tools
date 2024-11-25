@@ -3,8 +3,23 @@ import time
 from einops.layers import torch
 
 from juju_tools.utils import *
-from juju_tools.utils.layers import compute_normal_fpk
+from scipy.stats import norm
 
+def compute_normal_fpk(bits, e=.967752) -> Tensor:
+    half_1 = 2 ** bits // 2
+    half_2 = 2 ** bits // 2 + 1
+
+    v1 = (-norm.ppf(torch.linspace(.5, e, half_1, dtype=torch.float16))).tolist()[1:]
+    v2 = (norm.ppf(torch.linspace(.5, e, half_2, dtype=torch.float16))).tolist()
+
+    g = v1 + v2
+    g.sort()
+    nf4 = torch.tensor(g)
+    nf4 /= nf4.amax()
+
+    return nf4.to(torch.bfloat16)
+
+PRECOMPUTED_NORMAL_FP4 = compute_normal_fpk(bits=4)
 
 # TODO rename this to TensorNFK or something
 # TODO act. rename this to just TensorN4K, will not work for...

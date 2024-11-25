@@ -1,7 +1,6 @@
 from juju_tools.utils import *
 
-from juju_tools.utils.math import Estimator
-
+from juju_tools.utils.math.estimator import Estimator
 
 # TODO test this
 class GaussNewtonBartlett(Estimator):

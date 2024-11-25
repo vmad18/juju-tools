@@ -1,5 +1,5 @@
 from juju_tools.utils import *
-from juju_tools.utils.math import Estimator
+from juju_tools.utils.math.estimator import Estimator
 
 
 class Hutchinson(Estimator):
