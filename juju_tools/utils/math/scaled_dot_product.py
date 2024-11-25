@@ -44,9 +44,9 @@ def scaled_dot_product(
 
         attends = (q @ k.transpose(-2, -1)).float() * norm + mask
 
-        attn = F.softmax(attends, dtype=torch.float32, dim=-1).to(q.dtype)
+        attn = F.softmax(attends, dtype=torch.float32, dim=-1)
         attn = F.dropout(attn, p=drop_r, training=training)
-        return attn @ v
+        return attn @ v.to(torch.float32)
 
     return flash_attn_func(q.to(torch.bfloat16), k.to(torch.bfloat16), v.to(torch.bfloat16),
                            dropout=drop_r, softmax_scale=scaling_norm, causal=True, window_size=(-1, -1),

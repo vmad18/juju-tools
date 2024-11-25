@@ -9,20 +9,20 @@ class NormAttention(Module):
                  layer_idx: Optional[int]):
         super().__init__()
 
-        self.to_q = nn.Linear(self.config.dim, config.head_dim * self.config.attn_heads,
-                                bias=config.bias, dtype=config.dtype, device=self.config.device)
-        self.to_k = nn.Linear(self.config.dim, config.head_dim * self.config.attn_heads,
-                                bias=config.bias, dtype=config.dtype, device=self.config.device)
-        self.to_v = nn.Linear(self.config.dim, config.head_dim * self.config.attn_heads,
-                                bias=config.bias, dtype=config.dtype, device=self.config.device)
-        self.o_proj = nn.Linear(self.config.head_dim, self.config_dim,
-                                bias=config.bias, dtype=config.dtype, device=self.config.device)
+        self.to_q = nn.Linear(config.dim, config.head_dim * config.attn_heads,
+                                bias=config.bias, dtype=config.dtype, device=config.device)
+        self.to_k = nn.Linear(config.dim, config.head_dim * config.attn_heads,
+                                bias=config.bias, dtype=config.dtype, device=config.device)
+        self.to_v = nn.Linear(config.dim, config.head_dim * config.attn_heads,
+                                bias=config.bias, dtype=config.dtype, device=config.device)
+        self.o_proj = nn.Linear(config.head_dim * config.attn_heads, config.dim,
+                                bias=config.bias, dtype=config.dtype, device=config.device)
 
-        self.rope = RoPE(config) if self.config.rope else RoPE.pass_qk
+        self.rope = RoPE(config) if config.rope else RoPE.pass_qk
 
         self.norm = L2Norm()
-        self.s_qk = nn.Parameter(torch.ones(config.head_dim * config.attn_heads, dtype=torch.float32) * config.s_qk_scale)
-        self.alpha = nn.Parameter(torch.ones(config.dim, dtype=torch.float32) * config.alpha_a_scale)
+        self.s_qk = nn.Parameter(torch.ones(config.head_dim * config.attn_heads, dtype=config.dtype, device=config.device) * config.s_qk_scale)
+        self.alpha = nn.Parameter(torch.ones(config.dim, dtype=config.dtype, device=config.device) * config.alpha_a_scale)
 
         self.config = config
         self.layer_idx = layer_idx

@@ -8,19 +8,17 @@ class NormFeedForward(Module):
                  layer_idx: Optional[int] = None):
         super().__init__()
 
-        self.config = config
-
         self.norm = L2Norm()
 
-        self.proj_up = nn.Linear(self.config.dim, config.hidden_state, bias=self.config.bias, device=self.config.device)
-        self.gate = nn.Linear(self.config.dim, config.hidden_state, bias=self.config.bias, device=self.config.device) \
-            if self.config.gate else nn.Identity()
+        self.proj_up = nn.Linear(config.dim, config.hidden_state, bias=config.bias, device=config.device, dtype=config.dtype)
+        self.gate = nn.Linear(config.dim, config.hidden_state, bias=config.bias, device=config.device, dtype=config.dtype) \
+            if config.gate else nn.Identity()
 
-        self.proj_down = nn.Linear(config.hidden_state, self.config.dim, bias=self.config.bias, device=self.config.device)
+        self.proj_down = nn.Linear(config.hidden_state, config.dim, bias=config.bias, device=config.device, dtype=config.dtype)
 
-        self.s_u = torch.ones(config.hidden_state, dtype=config.dtype, device=self.config.device) * config.s_u_scale
-        self.s_v = torch.ones(config.hidden_state, dtype=config.dtype, device=self.config.device) * config.s_v_scale
-        self.alpha = torch.ones(config.hidden_state, dtype=config.dtype, device=self.config.device) * config.alpha_m_scale
+        self.s_u = nn.Parameter(torch.ones(config.hidden_state, dtype=config.dtype, device=config.device)) * config.s_u_scale
+        self.s_v = nn.Parameter(torch.ones(config.hidden_state, dtype=config.dtype, device=config.device)) * config.s_v_scale
+        self.alpha = nn.Parameter(torch.ones(config.dim, dtype=config.dtype, device=config.device)) * config.alpha_m_scale
 
         self.config = config
         self.layer_idx = layer_idx

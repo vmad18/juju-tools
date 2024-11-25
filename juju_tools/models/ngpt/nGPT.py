@@ -39,10 +39,10 @@ class nGPTAutoRegressive(Module):
     def __init__(self, config: nGPTConfig):
         super().__init__()
 
-        self.embed = nn.Embedding(config.vocab_size, config.dim)
+        self.embed = nn.Embedding(config.vocab_size, config.dim, device=config.device, dtype=config.dtype)
         self.stream = nGPT(config)
-        self.lm_head = nn.Linear(config.dim, config.vocab_size, bias=False)
-        self.s_z = nn.Parameter(torch.ones(config.vocab_size, dtype=config.dtype)) * config.s_z_scale
+        self.lm_head = nn.Linear(config.dim, config.vocab_size, bias=False, device=config.device, dtype=config.dtype)
+        self.s_z = nn.Parameter(torch.ones(config.vocab_size, dtype=config.dtype, device=config.device)) * config.s_z_scale
 
         self.config = config
         self.apply(self._init_weights)
