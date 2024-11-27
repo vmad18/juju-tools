@@ -12,6 +12,5 @@ def create_model():
     logger.info(x)
     model(x)
 
-
 if __name__ == "__main__":
     create_model()

@@ -1,1 +1,1 @@
-from juju_tools.models.ngpt.nGPT import *
+from juju_tools.models.ngpt.ngpt import *
