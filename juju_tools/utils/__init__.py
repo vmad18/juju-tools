@@ -1,5 +1,3 @@
-import torch
-
 from juju_tools.utils.consts import *
 
 class Config(object):
@@ -34,6 +32,7 @@ class Config(object):
 
         self.pad_tok_idx = -1
 
+        self.dtype = torch.float32
         self.__dict__.update(kwargs)
 
 
@@ -106,7 +105,7 @@ class nGPTConfig(Config):
         self.s_z_scale = 1. / (self.dim ** 0.5)
         self.s_z_init = 1.
 
-        self.dtype = torch.bfloat16
+        self.dtype = torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else torch.float16
 
 
         self.__dict__.update(kwargs)

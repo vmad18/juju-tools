@@ -2,7 +2,7 @@ from juju_tools.utils.consts import *
 from juju_tools.utils.optim.scheduler import LRScheduler
 
 
-class CosineLR(LRScheduler):
+class CosineLRS(LRScheduler):
     """
     Cosine Annealing Learning Rate Scheduler w/ Warmup
     """
@@ -27,6 +27,7 @@ class CosineLR(LRScheduler):
             return self.min_lr
 
         gate = (self.iter - self.warmup_iters) / (self.iters - self.warmup_iters)
+        assert 0 <= gate <= 1
         return self.min_lr + 0.5 * (self.max_lr - self.min_lr) * (1 + math.cos(gate * pi))
 
     def step(self):
