@@ -4,7 +4,7 @@ from juju_tools.utils.layers import RoPE, FlashAttention
 from juju_tools.utils.math import scaled_dot_product
 
 
-class CrossAttention(ModuleConfig):
+class CrossAttention(Module):
 
     r"""
     

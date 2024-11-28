@@ -1,5 +1,5 @@
 from juju_tools.utils import *
-
+from juju_tools.utils.configs import Config
 
 class DynKVCache:
 

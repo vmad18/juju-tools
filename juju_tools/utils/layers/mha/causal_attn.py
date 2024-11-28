@@ -2,13 +2,14 @@ from juju_tools.utils import *
 
 from juju_tools.utils.layers import RoPE
 
+from juju_tools.utils.configs import LLaMaConfig
 from juju_tools.utils.layers.transforms.embeds import DynNTKRoPE
 from juju_tools.utils.math import scaled_dot_product, FlashAttention, causal_mask
 from juju_tools.utils.layers.mha.attn_utils import DynKVCache
 from juju_tools.kernels.py.fused_attn import flash_attn
 
 # TODO remove forward parameters for flash attn
-class CausalAttention(ModuleConfig):
+class CausalAttention(Module):
     r"""
     
     Causal attention 

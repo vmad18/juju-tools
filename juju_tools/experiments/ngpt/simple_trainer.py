@@ -6,7 +6,7 @@ from juju_tools.experiments.ngpt.train import learning_rate, beta1
 from juju_tools.utils.consts import *
 
 from juju_tools.models import nGPTAutoRegressive
-from juju_tools.utils import nGPTConfig, Config
+from juju_tools.utils.configs import nGPTConfig, Config
 from juju_tools.utils.optim import LRScheduler
 
 from torch.amp import GradScaler

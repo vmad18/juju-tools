@@ -1,4 +1,4 @@
-from juju_tools.utils import nGPTConfig
+from juju_tools.utils.configs import nGPTConfig
 from juju_tools.utils.consts import *
 from juju_tools.utils.layers import NormAttention, NormFeedForward, L2Norm
 

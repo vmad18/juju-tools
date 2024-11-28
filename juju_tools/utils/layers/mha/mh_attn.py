@@ -3,7 +3,7 @@ from juju_tools.utils import *
 from juju_tools.utils.layers import RoPE
 from juju_tools.utils.math import scaled_dot_product, FlashAttention
 
-class MultiHeadAttention(ModuleConfig):
+class MultiHeadAttention(Module):
 
     r"""
     
